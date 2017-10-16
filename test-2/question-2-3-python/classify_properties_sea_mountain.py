@@ -15,9 +15,6 @@ number_of_categories = len(categories)
 #attempt to classify each listing between the classes
 #I got some frequent words that could be found in each category
 #GET THE FREQUENCY OF THE WORDS
-#WATER:: it's common to find it in the sea category, but 
-#this word is misleading - water view, waterfront, central water supply, water tank
-#tank. To capture this, we would need to extract 2-grams of words
 seeds_per_category = [["mountain","country"],["sea","ocean","beach","lake","bay"]]
 #Simple approach that worked fine for this example
 #classified as distant supervision approach -
