@@ -80,6 +80,12 @@ From this combined data, some features were created and a few are described belo
 
 ### Removing Outliers
 
+I plotted histograms of several features, namely *built_area*, *used_area*, *new_price*, *old_price*, *price_variation_per_square_meter*. I also plotted scatterplots to visualize the relationship between the area features and the new_price.
 
+![Old price histogram](feature_analysis/old_price.png?raw=true "Old price histogram") ![New price histogram](feature_analysis/new_price.png?raw=true "New price histogram")
+
+From these two histograms, we can see that almost all prices are lower than 15 million, with only a few greater than that. Therefore, entries with new_price or old_price greater than 15 million were removed. 
+
+These graphs are presented in the folder "feature_analysis" and can be obtained from the main Python code when the line **create_plots.plots(prices_sea_views_areas)** is uncommented.
 
 ![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram")
