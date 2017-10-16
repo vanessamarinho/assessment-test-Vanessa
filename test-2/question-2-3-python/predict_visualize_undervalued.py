@@ -37,6 +37,7 @@ def get_final_values_after_month(month, data, previous_values):
     return new_values
 
 #### -------- Question 2
+
 #------------------Read all data
 price_changes = pd.read_csv("Price_changes.csv", delimiter = ";")
 area = pd.read_csv("Built_used_area.csv", delimiter = ";")
@@ -47,28 +48,19 @@ if details_with_categories.is_file() == False:
 categories = pd.read_csv("Details_with_categories.csv", delimiter = ";")
 
 #-----------------Cleaning
-#some old prices in the price_changes have values equal to 0.
-#delete these lines
 price_changes = price_changes[price_changes['old_price'] != 0]
 price_changes = price_changes.dropna(how = 'all')
-#remove all listings with built area = NAN and used area = NAN
 area = area.dropna(how = 'all', subset=['built_area','used_area'])
-#fill the remaining NAN with 0
 area = area.fillna(0)
-#removing the lines where built and used are equal to 0
 area = area[(area['built_area'] + area['used_area'] > 0)]
-#The file Built_used_area.csv has some listing_id with more than one entry
-#This code combines all the duplicates in a single listing and the values
-# for the fields will be the average
 area = area.groupby("listing_id").mean().reset_index()
 
 #calculate the variation per sqm in all sea view properties
-#Get all listings with sea view
 #I used the variation of the price per sqm instead of the actual price per
 #sm because it would be troublesome to obtain this information from the dataset 
 #since we dont have the price of every listing at every month
 #this info would need to be inferred from the price changes
-#Then I decided to work with the variation and convert it to the price later
+#Get all listings with sea view
 sea_views = categories[(categories['Category'] == "Sea Area") | (categories['Category'] == "Both")]
 prices_sea_views = pd.merge(price_changes, sea_views, on='listing_id') 
 prices_sea_views_areas = pd.merge(area, prices_sea_views, on='listing_id') 
@@ -80,7 +72,7 @@ prices_sea_views_areas['price_variation_per_square_meter'] = prices_sea_views_ar
 #Get plots of the dataframe
 #create_plots.plots(prices_sea_views_areas)
 
-#-----------------Removing outliers - 468 before removing outliers, 449 after
+#-----------------Removing outliers
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['new_price'] < 15000000) & (prices_sea_views_areas['old_price'] < 15000000) & (prices_sea_views_areas['used_area'] < 1250)  & (prices_sea_views_areas['built_area'] < 1250)]
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['price_variation_per_square_meter'] > -5000) & (prices_sea_views_areas['price_variation_per_square_meter'] < 5000)]
 
@@ -88,14 +80,7 @@ variation_per_sqm = prices_sea_views_areas.groupby('months_passed')['price_varia
 #the variation has to be averaged over all listings, not the number of price_changes in that month
 variation_per_sqm['monthly_variation_per_sqm'] = variation_per_sqm['monthly_variation_per_sqm']/len(prices_sea_views_areas['listing_id'].unique())
 
-#Write about the Moving average - which is good to get maybe the next element
-#----- Predict
-#As we want the prices in January, February, March, April and May 2018
-#First let's predict the price/sqm variation in that months and then
-#from the initial average price/sqm we can obtain the price per sqm in 
-#that periods
-#To do that, we need to predict the variation for:
-#September - October - November - December - January - ... - May
+#-----------------Predict
 months_to_predict = 9
 months = [(pd.Period("09/2017")+i) for i in range(20)]
 variation_series = pd.Series(variation_per_sqm['monthly_variation_per_sqm'].tolist(),index=[(pd.Period("01/2016")+i) for i in range(20)])
@@ -136,13 +121,11 @@ initial_price_per_sqm = np.mean(first_prices_area_info['initial_price_per_sqm'])
 initial_price_and_variations = [initial_price_per_sqm] + variation_per_sqm['monthly_variation_per_sqm'].tolist() + predictions
 price_per_sqm_series = list(accumulate(initial_price_and_variations))
 
-#The average (rounded to the closest integer) price of a property from 200 to 300 meters
-#will be calculated as 250 * predicted price per square meter
+#Get the predicted values for January to May
 print("Predicted average price of properties with a sea view between 200 - 300 built area")
 for i,price in enumerate(price_per_sqm_series[-5:]):
     forecast = 250 * price
     print("%s : %d" % (str(pd.Period("01/2018")+i),forecast))
-
 
 plt.figure()
 variation_series = pd.Series(price_per_sqm_series[1:21],index=[(pd.Period("01/2016")+i) for i in range(20)])
@@ -152,10 +135,6 @@ predicted_series.plot(linestyle='--', marker='o',color="red")
 plt.title("Monthly average price/sqm ")
 plt.ylabel("Average price/sqm")
 plt.savefig("time_series_plots/time_series_values_monthly.png")
-
-#Works fairly well, with a decrease trend, steady periods around october and increase 
-#in April
-
 
 #### -------- Question 3
 if not os.path.exists("undervalued_properties"):

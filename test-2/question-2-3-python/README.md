@@ -22,10 +22,10 @@ For questions 2 and 3, I first had to select the properties with a sea view. Thi
 To solve this, I created an approach that combines **bag of words** with **distant supervision**.
 Distant supervision is a technique in which rules (or heuristics) are used to automatically label data. Each property was then represented by its bag of words (i.e. the set of words in the description and their frequencies) and then classified automatically according to a few rules. Such rules are based in two sets of keywords (called seeds in the code). These keyword sets include words frequently found in descriptions related with a sea view and a mountain view. The selected sets are:
 
-* mountain_keywords: **mountain** and **country**
-* sea_keywords: **sea**, **ocean**, **beach**, **lake** and **bay**
+* mountain_keywords: **mountain**, **mountains** and **country**
+* sea_keywords: **sea**, **ocean**, **beach**, **beaches**, **lake**, **lakes** and **bay**
 
-The main idea is that descriptions that contain sea_keywords are likely to have a "sea view", and so on. It's important to mention that the word **water** was not included in the sea_keywords, even though it can be found in some sea view descriptions. This is because this word is ambiguous and can be used to list other features, such as *central water supply* and *water tank*. Approaches like *n*-grams of words could be used in order to disambiguate those usagesof the word *water*.
+The main idea is that descriptions that contain sea_keywords are likely to have a "sea view", and so on. It's important to mention that the word **water** was not included in the sea_keywords, even though it can be found in some sea view descriptions. This is because this word is ambiguous and can be used to list other features, such as *central water supply* and *water tank*. Approaches like *n*-grams of words could be used in order to disambiguate those usages of the word *water*.
 
 The created rules are presented below:
 
@@ -38,10 +38,10 @@ After doing this, the distribution of properties and classes were:
 
 | Category        | Occurrences  |
 | ------------- |:-------------:| 
-| Both      | 318 | 
-| Mountain Area      | 471      | 
-| Sea Area      | 722      | 
-| Undefined | 899      |  
+| Both      | 322 | 
+| Mountain Area      | 481      | 
+| Sea Area      | 719      | 
+| Undefined | 888      |  
 
 One description from the *Both* class is presented below:
 "Fireplace, Security system, Guest apartment, Jacuzzi, Air conditioning, Basement, Sauna, Built-in kitchen, Sea/lake view, Terrace, Elevator, Mountain view, Swimming pool,  Garden"
@@ -56,7 +56,7 @@ One description from the *Undefined* class is presented below:
 My approach for question 2 is based on the two modelling decisions:
 
 1. Even though the question asks to predict only the prices for properties with a sea view and built area between 200 and 300, I included all the properties with a sea view in my analysis (using the previous method to classify). My idea was that by including more data (properties with area between 200 and 300 are just a few), more accurate values for price per square meter (also referred to as price/sqm) would be obtained. In the end, the predicted prices for properties between 200 and 300 are given as 250(average of the sizes) times the predicted prices/sqm in that particular months.
-2. The **prediction task** was performed using a **time series analysis**. However, if I had modelled my time series using the average values of the prices/sqm, the obtained series wouldn't be *stationary* (with constant mean and variance), which is a property required by some prediction methods. Because of this, I modelled the time series as the variation of the average price/sqm, i.e. each point in the time series represents how much the average price/sqm increased (or decreased) compared to the previous period. This technique in which values are subtracted is known as the *first difference* of a time series. Then, from the predicted variation of the average prices/sqm, it's possible to transform the data back to the prices/sqm and obtain those predicted values. Moreover, the variation values are easier to be obtained from the file *Price_changes.csv*. In every price change, we have the old and new prices and we know the size of the property, so we have the variation of the price/sqm of that property in a particular month. The variation of average price/sqm in each month is given by the average of those variations (from the price changes) over all properties. 
+2. The **prediction task** was performed using a **time series analysis**. However, if I had modelled my time series using the average values of the prices/sqm, the obtained series wouldn't be *stationary* (with constant mean and variance), which is a property required by some prediction methods. Because of this, I modelled the time series as the average variation of the price/sqm, i.e. each point in the time series represents how much the average price/sqm increased (or decreased) compared to the previous period. This technique in which a series is obtained by the subtraction of the original values is known as the *first difference* of a time series. Then, from the predicted average variation of the prices/sqm, it's possible to transform the values back to the prices/sqm and obtain those predicted values. Moreover, the variation values are easier to be obtained from the file *Price_changes.csv*, which only includes the prices of the properties when there are variations. Because we have the old and new prices and we know the size of each property, we easily obtain the variation of the price/sqm (i.e. previous price/sqm - new price/sqm) of a property in each price change. Therefore, the average variation of the price/sqm in a month X is given by the sum of all variations (from the price changes) that happened in that month divided by all properties. 
 
 ## Data Cleaning and Transformation
 
@@ -95,3 +95,26 @@ We can see that many values are 0 and most of the properties have sizes lower th
 From the two first graphs, we visually verify that the price of the property correlates with its size, which suggests that it's a good decision to predict new values based on the price per square meter of all properties. Finally, the last histogram shows the price variation per square meter for all listings. We can see that the prices per square meter from all listings varied between -5000 and +5000. Therefore, all the listings that the price per square meter varied by less than -5000 or more than +5000 were considered anomalies and were disregarded.  
  
 These graphs are included in the folder "feature_analysis" and can be obtained from the main Python code when the line **create_plots.plots(prices_sea_views_areas)** is uncommented.
+
+## Predict - Question 2
+Each month was considered a single observation period. Therefore, we only had 20 observations, from January 2016 to August 2017. As the question requires the prices in January, February, March, April and May 2018, we first need to predict the prices for the months in between, September to December, and then predict the rest, a total of 9 predictions.
+
+One technique that can be used to predict time series values is called moving average, in which the average of the last *n* observations are used to predict the *n+1* observation. However, this technique is good to predict only a few points in the future. Because I had to predict 9 points in the future, I selected a more complex model called **ARIMA**, which stands for Autoregressive Integrated Moving Average Model. I tried several ARIMA parameters and selected those which returned the best visual results. The time series with the average variation prices/sqm is presented below, in which observed data is presented as blue dots and predicted data as red dots.
+
+![Time series with the average variation prices/sqm](time_series_plots/time_series_variation_values.png?raw=true "Time series with the average variation prices/sqm")
+
+As I mentioned earlier, this obtained time series can be considered *stationary*, since the mean doesn't vary much. Now that we predicted the average variation prices/sqm, the actual average prices/sqm are given by applying the successive variations to the initial average price/sqm, which was considered as the average of the old prices of the properties in their first price change. The time series with the average prices/sqm is presented below.
+
+![Time series with the average prices/sqm](time_series_plots/time_series_values_monthly.png?raw=true "Time series with the average prices/sqm")
+
+From this last graph, we can see that the predicted values fit fairly well the observed data. A few patters such as steady periods around October and slightly increases around April are reproduced in the predicted values. Using these predicted average prices/sqm, the price of a property with built area between 200 and 300, was given by 250 * the respective predicted prices. The predicted prices (rounded to the closest integer) are presented below:
+
+| Month        | Price  |
+| ------------- |:-------------:| 
+| 2018-01      | 1724196 | 
+| 2018-02      | 1720897      | 
+| 2018-03      | 1721494      | 
+| 2018-04 | 1722132      |  
+| 2018-05 | 1722905      |
+
+#Undervalued properties - Question 3

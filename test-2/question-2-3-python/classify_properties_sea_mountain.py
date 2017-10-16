@@ -15,7 +15,7 @@ number_of_categories = len(categories)
 #attempt to classify each listing between the classes
 #I got some frequent words that could be found in each category
 #GET THE FREQUENCY OF THE WORDS
-seeds_per_category = [["mountain","country"],["sea","ocean","beach","lake","bay"]]
+seeds_per_category = [["mountain","mountains","country"],["sea","ocean","beach","beaches","lake","lakes","bay"]]
 #Simple approach that worked fine for this example
 #classified as distant supervision approach -
 #classify data according to some rules
