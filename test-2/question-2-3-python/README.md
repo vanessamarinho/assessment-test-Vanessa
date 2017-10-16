@@ -23,7 +23,7 @@ The main idea is that descriptions that contain sea_keywords are likely to have 
 
 The created rules are presented below:
 
-* When the bag of words contains **at least one** sea_keywords and *none* mountain_keywords, the property would be classified as **Sea Area**;
+* When the bag of words contains **at least one** sea_keywords and **none** mountain_keywords, the property would be classified as **Sea Area**;
 * When the bag of words contains **none** sea_keywords and **at least one** mountain_keywords, the property would be classified as **Mountain Area**;
 * When the bag of words contains words from both sets, the property would be classified as *Both*;
 * The **Undefined** class covers the properties that do not present any of the selected keywords.
@@ -43,6 +43,15 @@ One description from the *Both* class is presented below:
 One description from the *Undefined* class is presented below:
 "Security system, Fireplace, Terrace, Guest apartment, Jacuzzi, Air conditioning, Swimming pool, Basement, Sauna,  Guest toilet, Garden, Built-in kitchen"
 
-### Removing outliers
+**NOTE:** The experiments in question 2 and 3 were then made for properties classified as *Sea Area* and *Both*
+
+## Rationale
+
+My approach for question 2 is based on the two modelling decisions:
+
+1. Even though the question asks to predict only the prices for properties with a sea view and built area between 200 and 300, I included all the properties with a sea view in my analysis (using the previous method to classify). My idea was that by including more data (properties with area between 200 and 300 are just a few), more accurate values for price per square meter (also referred to as price/sqm) would be obtained. In the end, the predicted prices for properties between 200 and 300 are given as 250(average of the sizes) times the predicted prices/sqm in that particular months.
+2. The **prediction task** was performed using a **time series analysis**. However, if I had modelled my time series using the average values of the prices/sqm, the obtained series wouldn't be *stationary* (with constant mean and variance), which is a property required by some prediction methods. Because of this, I modelled the time series as the variation of the average price/sqm, i.e. each point in the time series represents how much the average price/sqm increased (or decreased) compared to the previous period. This technique in which values are subtracted is known as the *first difference* of a time series. Then, from the predicted variation of the average prices/sqm, it's possible to transform the data back to the prices/sqm and obtain those predicted values. Moreover, the variation values are easier to be obtained from the file *Price_changes.csv*. In every price change, we have the old and new prices and we know the size of the property, so we have the variation of the price/sqm of that property in a particular month. The variation of average price/sqm in each month is given by the average of those variations (from the price changes) over all properties. 
+
+### Data Cleaning and Transformation
 
 ![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram")
