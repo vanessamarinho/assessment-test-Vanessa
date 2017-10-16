@@ -77,7 +77,7 @@ prices_sea_views_areas['price_variation'] = (prices_sea_views_areas['new_price']
 prices_sea_views_areas['price_variation_per_square_meter'] = prices_sea_views_areas.apply(lambda row: get_avg_variation_per_sqm(row['price_variation'], row['built_area'], row['used_area']), axis=1)
 
 #Get plots of the dataframe
-#create_plots.plots(prices_sea_views_areas)
+create_plots.plots(prices_sea_views_areas)
 
 #-----------------Removing outliers - 468 before removing outliers, 449 after
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['new_price'] < 15000000) & (prices_sea_views_areas['old_price'] < 15000000) & (prices_sea_views_areas['used_area'] < 1250)  & (prices_sea_views_areas['built_area'] < 1250)]
