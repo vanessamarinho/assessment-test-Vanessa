@@ -1,0 +1,20 @@
+/*Add green background for tags with text Target Value 1 - 4*/
+body div:first-child ul li:first-child ul li:last-child, 
+body div:first-child+div ul li:first-child ul li:last-child,
+body div:first-child+div ul li:nth-child(3),
+body div:last-child p:last-child {
+	background-color: green;
+}
+
+/* add the borders only on even itens from the ul after line 44, which corresponds to the 3rd div inside the tag body*/
+body div:nth-child(3) li:nth-child(even) {
+    border-style: solid;
+}
+
+/*select only the link-to-listing urls*/
+a[href="http://mydomain.com/link-to-listing"] {
+	display:block;
+	background-color: green;
+}
+
+

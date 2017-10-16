@@ -9,6 +9,12 @@ Questions 2 and 3 were solved together.
 * pandas (version 0.20.1)
 * matplotlib (version 2.0.2)
 
+### To run the code for questions 2 and 3 do:
+
+```
+python predict_visualize_undervalued.py
+```
+
 ## Properties with a sea view
 
 For questions 2 and 3, I first had to select the properties with a sea view. This had to be inferred from the descriptions presented in file *Details.csv* and there were multiple ways to indicate that, such as *views to the sea* and *sea view*.
@@ -63,14 +69,16 @@ the duplicates were combined in a single listing_id and the built and used area 
 
 ### New features
 
-The 
-Three features were created:
+After removing the missing data, the dataset **price_changes** (from Price_changes.csv) and the dataset **area** (from Built_used_area.csv) were merged (joined by the id of the listing) with those listing_ids with a sea view (from Details_with_categories.csv - a file created after the analysis to detect sea views).
+
+From this combined data, some features were created and a few are described below:
 
 * **months_passed**: It accounts for the number of months since the first observation. The first month in the dataset (January 2016) was considered Month 1. The last month with observed data was Month 20, which is August 2017.
-* **price_variation**: It is the difference between the new_price and the old_price.
+* **price_variation**: It is the difference between the new_price and the old_price of the listing.
+* **price_variation_per_square_meter**: It is the price_variation divided by the size of the property. **Note:** The size of the property was considered as the maximum value between the built_area and the used_area.
 
 
-### Outliers
+### Removing Outliers
 
 
 
