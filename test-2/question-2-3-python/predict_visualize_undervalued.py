@@ -9,6 +9,7 @@ Created on Wed Oct 11 15:18:00 2017
 from itertools import accumulate
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import pandas as pd
 from statsmodels.tsa.arima_model import ARIMA
 from pathlib import Path
@@ -77,7 +78,7 @@ prices_sea_views_areas['price_variation'] = (prices_sea_views_areas['new_price']
 prices_sea_views_areas['price_variation_per_square_meter'] = prices_sea_views_areas.apply(lambda row: get_avg_variation_per_sqm(row['price_variation'], row['built_area'], row['used_area']), axis=1)
 
 #Get plots of the dataframe
-create_plots.plots(prices_sea_views_areas)
+#create_plots.plots(prices_sea_views_areas)
 
 #-----------------Removing outliers - 468 before removing outliers, 449 after
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['new_price'] < 15000000) & (prices_sea_views_areas['old_price'] < 15000000) & (prices_sea_views_areas['used_area'] < 1250)  & (prices_sea_views_areas['built_area'] < 1250)]
@@ -110,6 +111,9 @@ for t in range(months_to_predict):
 	predicted = output[0]
 	predictions.append(predicted[0])
 	history.append(predicted)
+    
+if not os.path.exists("time_series_plots"):
+    os.makedirs("time_series_plots")
 
 plt.figure()
 predicted_series = pd.Series(predictions,index=[(pd.Period("09/2017")+i) for i in range(9)])
@@ -117,7 +121,7 @@ variation_series.plot(linestyle='--', marker='o')
 predicted_series.plot(linestyle='--', marker='o',color="red")
 plt.title("Monthly average variation of the price/sqm ")
 plt.ylabel("Average Variation")
-plt.savefig("time_series_variation_values.png")
+plt.savefig("time_series_plots/time_series_variation_values.png")
 
 #get the date of the first listing of each property
 first_prices = prices_sea_views_areas.groupby('listing_id')['change_date'].agg([min]).rename(columns={'min':'change_date'}).reset_index()
@@ -147,14 +151,13 @@ variation_series.plot(linestyle='--', marker='o')
 predicted_series.plot(linestyle='--', marker='o',color="red")
 plt.title("Monthly average price/sqm ")
 plt.ylabel("Average price/sqm")
-plt.savefig("time_series_values_monthly.png")
+plt.savefig("time_series_plots/time_series_values_monthly.png")
 
 #Works fairly well, with a decrease trend, steady periods around october and increase 
 #in April
 
 
 #### -------- Question 3
-import os
 if not os.path.exists("undervalued_properties"):
     os.makedirs("undervalued_properties")
     

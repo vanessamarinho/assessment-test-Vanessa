@@ -7,3 +7,6 @@
 * pandas (version 0.20.1)
 * matplotlib (version 2.0.2)
 
+### Removing outliers
+
+![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram")
