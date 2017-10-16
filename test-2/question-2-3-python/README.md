@@ -80,12 +80,18 @@ From this combined data, some features were created and a few are described belo
 
 ### Removing Outliers
 
-I plotted histograms of several features, namely *built_area*, *used_area*, *new_price*, *old_price*, *price_variation_per_square_meter*. I also plotted scatterplots to visualize the relationship between the area features and the new_price.
+I plotted histograms of several features, namely *built_area*, *used_area*, *new_price*, *old_price*, *price_variation_per_square_meter*. I also plotted scatterplots to visualize the relationship between the property size and the new_price. The graphs are presented below.
 
 ![Old price histogram](feature_analysis/old_price.png?raw=true "Old price histogram") ![New price histogram](feature_analysis/new_price.png?raw=true "New price histogram")
 
-From these two histograms, we can see that almost all prices are lower than 15 million, with only a few greater than that. Therefore, entries with new_price or old_price greater than 15 million were removed. 
+From these two histograms, we can see that almost all prices are lower than 15 million (1.5*10^7), with only a few outliers with values greater than that. Therefore, entries with new_price or old_price greater than 15 million were removed. 
 
-These graphs are presented in the folder "feature_analysis" and can be obtained from the main Python code when the line **create_plots.plots(prices_sea_views_areas)** is uncommented.
+![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram") ![Used area histogram](feature_analysis/used_area.png?raw=true "Used area histogram")
 
-![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram")
+We can see that many values are 0 and most of the properties have sizes lower than a thousand. For both sizes, all the listings with sizes greater than 1250 were removed.
+
+![Built area x New price](feature_analysis/built_areaXprice.png?raw=true "Built area x New price") ![Used area x New price](feature_analysis/used_areaXprice.png?raw=true "Used area x New price") ![Price variation per square meter](feature_analysis/price_variation_per_square_meter.png?raw=true "Price variation per square meter")
+
+From the two first graphs, we visually verify that the price of the property correlates with its size, which suggests that it's a good decision to predict new values based on the price per square meter of all properties. Finally, the last histogram shows the price variation per square meter for all listings. We can see that the prices per square meter from all listings varied between -5000 and +5000. Therefore, all the listings that the price per square meter varied by less than -5000 or more than +5000 were considered anomalies and were disregarded.  
+ 
+These graphs are included in the folder "feature_analysis" and can be obtained from the main Python code when the line **create_plots.plots(prices_sea_views_areas)** is uncommented.
