@@ -12,7 +12,7 @@ Questions 2 and 3 were solved together.
 ### To run the code for questions 2 and 3 do:
 
 ```
-python predict_visualize_undervalued.py
+python predict_visualize_outliers.py
 ```
 
 ## Properties with a sea view
@@ -44,10 +44,14 @@ After doing this, the distribution of properties and classes were:
 | Undefined | 888      |  
 
 One description from the *Both* class is presented below:
-"Fireplace, Security system, Guest apartment, Jacuzzi, Air conditioning, Basement, Sauna, Built-in kitchen, Sea/lake view, Terrace, Elevator, Mountain view, Swimming pool,  Garden"
+```
+Fireplace, Security system, Guest apartment, Jacuzzi, Air conditioning, Basement, Sauna, Built-in kitchen, Sea/lake view, Terrace, Elevator, Mountain view, Swimming pool,  Garden
+```
 
 One description from the *Undefined* class is presented below:
-"Security system, Fireplace, Terrace, Guest apartment, Jacuzzi, Air conditioning, Swimming pool, Basement, Sauna,  Guest toilet, Garden, Built-in kitchen"
+```
+Security system, Fireplace, Terrace, Guest apartment, Jacuzzi, Air conditioning, Swimming pool, Basement, Sauna,  Guest toilet, Garden, Built-in kitchen
+```
 
 **NOTE:** The experiments in question 2 and 3 were then made for properties classified as *Sea Area* and *Both*
 
@@ -79,12 +83,11 @@ From this combined data, some features were created and a few are described belo
 
 
 ### Removing Outliers
-
-I plotted histograms of several features, namely *built_area*, *used_area*, *new_price*, *old_price*, *price_variation_per_square_meter*. I also plotted scatterplots to visualize the relationship between the property size and the new_price. The graphs are presented below.
+In order to obtain a model that extracts the main patterns and can generalize well to new observations, data that deviates markedly from others is usually removed. I plotted histograms of several features, namely *built_area*, *used_area*, *new_price*, *old_price*, *price_variation_per_square_meter*. By looking at those graphs, unusual observations are usually spotted. I also plotted scatterplots to visualize the relationship between the property size and the new_price. These graphs are presented below.
 
 ![Old price histogram](feature_analysis/old_price.png?raw=true "Old price histogram") ![New price histogram](feature_analysis/new_price.png?raw=true "New price histogram")
 
-From these two histograms, we can see that almost all prices are lower than 15 million (1.5*10^7), with only a few outliers with values greater than that. Therefore, entries with new_price or old_price greater than 15 million were removed. 
+From these two histograms, we can see that almost all prices are lower than 15M (million), with only a few properties with values greater than that. Therefore, entries with new_price or old_price greater than 15 million were removed. 
 
 ![Built area histogram](feature_analysis/built_area.png?raw=true "Built area histogram") ![Used area histogram](feature_analysis/used_area.png?raw=true "Used area histogram")
 
@@ -92,7 +95,7 @@ We can see that many values are 0 and most of the properties have sizes lower th
 
 ![Built area x New price](feature_analysis/built_areaXprice.png?raw=true "Built area x New price") ![Used area x New price](feature_analysis/used_areaXprice.png?raw=true "Used area x New price") ![Price variation per square meter](feature_analysis/price_variation_per_square_meter.png?raw=true "Price variation per square meter")
 
-From the two first graphs, we visually verify that the price of the property correlates with its size, which suggests that it's a good decision to predict new values based on the price per square meter of all properties. Finally, the last histogram shows the price variation per square meter for all listings. We can see that the prices per square meter from all listings varied between -5000 and +5000. Therefore, all the listings that the price per square meter varied by less than -5000 or more than +5000 were considered anomalies and were disregarded.  
+From the two first graphs, we visually verify that the price of the property correlates with its size, which suggests that it's a good decision to predict new values based on the price per square meter of all properties. Finally, the last histogram shows the price variation per square meter for all listings. We can see that the prices per square meter from all listings varied between -5000 and +5000. Therefore, all the listings that the price per square meter varied by less than -5000 or more than +5000 were considered unusual and were disregarded.  
  
 These graphs are included in the folder "feature_analysis" and can be obtained from the main Python code when the line **create_plots.plots(prices_sea_views_areas)** is uncommented.
 
@@ -117,4 +120,25 @@ From this last graph, we can see that the predicted values fit fairly well the o
 | 2018-04 | 1722132      |  
 | 2018-05 | 1722905      |
 
-#Undervalued properties - Question 3
+## Undervalued outliers - Question 3
+For this question, I included back those unusual points that were removed in Question 2, and I used the average prices/sqm found on Question 2 to determine undervalued properties. There were only a few properties with prices greater than 30M (listing_ids=290227, 281582 and 296543) that were removed because they were making the y axis too large, and we are only interested in undervalued properties, not overvalued ones.
+
+A simple method that can be used to detect outliers is to find the points which are distant from the average by values greater than the standard deviation. This is based on the fact that in a normal distribution, almost 70% of values are within 1 standard deviation of the mean. In order to identify those points, a scatterplot for each month was created. In each graph, all properties were plotted. I also plotted the average line and the standard deviation around the average. Listings with an average price/sqm greater than the average are plotted as green points. On the other hand, listings with an average price/sqm lower than the average are plotted in gray. Gray points outside the shaded area can be considered outliers, since they are far from the average line by more than one standard deviation.
+
+The scatterplots for Months 1 and 5 (January 2016 and May 2016) are presented below:
+
+![Price x Area in 2016/01"](outlier_properties_all_points/undervalues_2016-01.png?raw=true "Price x Area in 2016/01") ![Price x Area in 2016/05](outlier_properties_all_points/undervalues_2016-05.png?raw=true "Price x Area in 2016/05")
+
+The graphs for the other months (which are very similar) are included in the folder "outlier_properties_all_points". We can see that the properties bigger than 1,400 square meters are inside the shaded area. Therefore, in order to better visualize the other gray points, I reduced the x-axis from 3,000 to 1,400. The graphs for Months 1 and 5 (January 2016 and May 2016) are presented below:
+
+![Price x Area in 2016/01"](outlier_properties/undervalues_2016-01.png?raw=true "Price x Area in 2016/01") ![Price x Area in 2016/05](outlier_properties/undervalues_2016-05.png?raw=true "Price x Area in 2016/05")
+
+A few undervalued outliers are easily spotted. The main one is a property with area of 1,200 and price at around 2,1M (not much greater than the predicted prices for the properties with sizes 200 - 300 in Question 2). A few months later, the price of this property was increased a bit, to around 3,2M. Other undervalued outliers have areas between 400 and 800 square meters and price values lower than 2,5M. The scatterplots from the other months do not change much from these two.
+
+I looked at the data and found that outlier with area of 1,200. A few features of this property is presented below.
+
+| listing_id | built_area | used_area | old_price | new_price | change_date | Details | Category |
+| ------------- |:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:| 
+| 296792	| 0.0	| 1200.0	| 2150000	| 3350000	| 2016-05-25	| Mountain view, Sea View, Private pool, Wellness, Bodega, Fireplace, ... | Both
+
+**NOTE**: To avoid warnings because this question plots many graphs, the code that creates the scatterplots just loops through the first 6 months, change it to range(1,21) to see the plots for all months. The plots are included in the folder "outlier_properties".
