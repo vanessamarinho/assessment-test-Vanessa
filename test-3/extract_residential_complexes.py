@@ -12,16 +12,6 @@ import re
 import string
 import unicodedata
 
-
-#My first idea was to identify the language of the title using a list of 
-#stopwords from NLTK, because some descriptions are in English and others in Spanish.
-#This doesnt work well because the titles are too short to have enough stopwords 
-#of some titles such as "2 bedroom apartment for sale, Milla De Oro, Marbella, Malaga Costa del Sol, Andalucia"
-# that are written in English but present many Spanish stopwords, such as "de", "del"
-#also english texts with "en" instead of "in", etc.
-#TODO: Use a Spanish parser for the other sentences - like a freeling
-#or to use a wrapper to connect to StanfordNLP
-
 def pre_process_title(title):
     #convert accented characters to its unaccented version
     title = ''.join(c for c in unicodedata.normalize('NFD', title) if unicodedata.category(c) != 'Mn')
@@ -46,17 +36,9 @@ def classify_location_automatically(data,selected_locations):
             
 
 def classify_location_with_sentence_patterns(title):
-    #Named Entity Recognition systems are sensible to capitalization
-    #In most of them, if they find a noun with capital letters that would
-    #be classified as a Proper Noun - this is what happens with 
-    #some titles where Sale, Middle, Apartmente are all capitalized
-    #If we lower case all letters, almost no proper nouns are recognized, only nouns
-    #That's why I didnt use ner. We would need a list of entities first
-    #to lowercase all other letters
     tokenizer = RegexpTokenizer(r'\w+')
     #chunked = ne_chunk(pos_tag(word_tokenize(title)))
     #common words found in the spanish listings
-    # a parser would be necessary
     location = ""
     if any(word in ['en','venta','dormitorio','apartamento'] for word in tokenizer.tokenize(title.lower())):
         title = title.lower()
@@ -119,6 +101,11 @@ if __name__ == "__main__":
     #to identify for example that "rio verde", "rio verde alto" and "rio verde playa" are the same thing
     
     #TODO: FROM THE UNDEFINED, SEE HOW MANY ARE MARBELLA...
+    
+    
+    
+    
+    
     
     
     

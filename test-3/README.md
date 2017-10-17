@@ -1,3 +1,37 @@
 # Test 3  - Vanessa Marinho
 
+### Python version and packages:
 
+* Python 3.6.1
+* pandas (version 0.20.1)
+* NLTK (version 3.2.3)
+
+## Main ideas and assumptions
+
+Almost all Meta location values are not filled, therefore this column was disregarded.
+
+Some descriptions of the properties are in English and Spanish. Therefore, *my first idea* about this test was to identify the language of the description using the lists of stopwords from NLTK. This wasn't helpful because some titles written in English, such as *"2 bedroom apartment for sale, Milla **De** Oro, Marbella, Malaga Costa **del** Sol, Andalucia"*, present many Spanish stopwords, such as *de* and *del*. In addition, there were also English texts with the word "en" instead of "in", which might be a common language dependent error, such as *"Wonderful apartment en Guadalpin Marbella, Golden Miles"* and *"Villa for sale en Marbella"*.
+
+My *second attempt* was to use named entity recognition (NER) systems in the English texts. The goal of these systems is to identify named entities, which are words that name people, organizations and location. However, these systems are case sensitive. In most of them, when a noun is found with capital letters, it's likely that this word will be classified as a Proper Noun, and would be classified as a named entity. Because of that, some words from the descriptions such as *Sale*, *Middle*, *Apartment* were classified as proper nouns. Lower-casing all words wouldn't help finding proper nouns (and therefore the named entities that represent the residential complexes) because all nouns and proper nouns would be mostly classified as nouns, which is mainly what a POS tagger does. Because of these reasons I did not use NER systems, only a POS tagger that I'll explain later. 
+
+In order to split the sentences between the two languages, I then hardcoded a few common words found in the Spanish listings, such as *en*, *venta*, *dormitorio*, and *apartamento*. Descriptions with at least one of those Spanish words would be treated as Spanish texts, otherwise the texts are considered as English.
+
+The approach for the Spanish texts were: 
+
+* I hardcoded two regular expressions to extract the possible residential complexes. The first one looks for words found after the expression ** en venta en **. If this expression is found, all following words until a punctuation mark are extracted as a candidate for a residential complexes. 
+
+The approach for the English texts were: 
+
+A part-of-speech (POS) tagger is a tool that tags words with their POS. The tags returned by the tagger follow this tagset convention, https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html.
+
+After extracting a candidate for residential complex according to one of the previous approaches, I verify if this candidate is not in the list [*Marbella*, *Puerto Banus*, *Golden Mile*, *Milla de Oro*, *Malaga*], and then the candidate (if different) is returned as a residential complex for that description.
+
+The obtained possible properties with frequency greater than 1 (an attempt to remove some misclassified ones) were then used to check the dataset one more time.
+
+## Results
+
+## Notes
+
+There were a few things that I wanted to try in this test but I didn't have time. One of them was to use a Spanish part-of-speech tagger instead of the hard coded rules. So that the Spanish approach would be similar to the English one, in which Nouns (NN), Proper Nouns (NNP), and foreign words (FW) after the preposition "in" are likely to be locations. As far as I'm aware, NLTK does not provide a Spanish POS tagger but it does provide some Spanish tagged text in which a unigram and bigram tagger can be trained. The other thing would be to include the few filled Meta location values in the analysis.
+
+For this task, some kind of external knowledge could be used in order to achieve better results. For example, extra information would be needed to differentiate "rio verde", "rio verde alto" and "rio verde playa" or group them as the same residential complex.
