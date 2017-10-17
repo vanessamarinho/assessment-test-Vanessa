@@ -2,7 +2,7 @@
 
 ### MySQL Version:
 
-MySQL 5.7
+MySQL 5.7 and MySQL Workbench 6.3 CE
 
 ### Data Cleaning
 
@@ -18,23 +18,25 @@ A **database** called *casafari* was created with the following tables:
 
 1. Given a listing_id, there are some duplicates in the table built_used_area, so I grouped them by id and the built and used area were given as the average of the built_area and used_area in all duplicates.
 
-2. The average price per square meter of the property in each price change is given by the new_price divided by the *maximum value* between built area and used area.
+2. The average price per square meter of the property in each price change is given by the new_price divided by the *maximum value* between built area and used area. 
 
-3. Finally, because there are some cases where one property had more than 1 price change in the year of 2016, the average price per sqm of that property is given by the average of all the price per sqm of that property in its price changes.
+3. I disregarded the price changes in which the old_price was equal to 0. These changes do not represent a real price increase.
+
+4. Finally, because there are some cases where one property had more than 1 price change in the year of 2016, the average price per square meter (price/sqm) of that property is given by the average of all the prices/sqm of that property in its price changes.
 
 #### Extract the **average price/sqm per property** with an increased price in 2016 that have an area > 200 
 
 ```sql
 SELECT combined_prices_areas.listing_id, AVG(combined_prices_areas.listing_sqm_price) as avg_sqm_price FROM
 	(SELECT prices.listing_id, prices.new_price/GREATEST(areas.built,areas.used) as listing_sqm_price FROM
-		(SELECT listing_id, new_price FROM casafari.price_changes WHERE new_price - old_price > 0 and YEAR(STR_TO_DATE(change_date,'%Y-%m-%d')) = 2016) prices
+		(SELECT listing_id, new_price FROM casafari.price_changes WHERE new_price - old_price > 0 and old_price > 0 and YEAR(STR_TO_DATE(change_date,'%Y-%m-%d')) = 2016) prices
 	INNER JOIN
 		(SELECT listing_id, AVG(built_area) as built, AVG(used_area) as used FROM casafari.built_used_area WHERE built_area > 200 OR used_area > 200 GROUP BY listing_id) areas
 	ON prices.listing_id = areas.listing_id) combined_prices_areas
 GROUP BY combined_prices_areas.listing_id
 ```
 
-Result for a few IDS
+Results for a few IDs
 
 |listing_id |avg_sqm_price|
 | ------------- |:-------------:| 
@@ -53,14 +55,14 @@ To do that, we have to average the previous results, so that:
 SELECT AVG(combine_all_listings.avg_sqm_price) FROM 
 	(SELECT combined_prices_areas.listing_id, AVG(combined_prices_areas.listing_sqm_price) as avg_sqm_price FROM
 		(SELECT prices.listing_id, prices.new_price/GREATEST(areas.built,areas.used) as listing_sqm_price FROM
-			(SELECT listing_id, new_price FROM casafari.price_changes WHERE new_price - old_price > 0 and YEAR(STR_TO_DATE(change_date,'%Y-%m-%d')) = 2016) prices
+			(SELECT listing_id, new_price FROM casafari.price_changes WHERE new_price - old_price > 0 and old_price > 0 and YEAR(STR_TO_DATE(change_date,'%Y-%m-%d')) = 2016) prices
 		INNER JOIN
 			(SELECT listing_id, AVG(built_area) as built, AVG(used_area) as used FROM casafari.built_used_area WHERE built_area > 200 OR used_area > 200 GROUP BY listing_id) areas
 		ON prices.listing_id = areas.listing_id) combined_prices_areas
 	GROUP BY combined_prices_areas.listing_id) combine_all_listings
 ```
 
-The new result would be: **6511.09**
+The new result would be: **6438.81**
 
 
 

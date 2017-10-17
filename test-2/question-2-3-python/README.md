@@ -69,7 +69,7 @@ My approach for question 2 is based on the two modelling decisions:
 
 ### Missing data
 
-* **Price_changes.csv**: This file had some price changes in which the old_value was equal to 0.  These price changes were disregarded because they do not represent a real price increase. Price changes with any of the values as "nan" were removed.
+* **Price_changes.csv**: This file had some price changes in which the old_price was equal to 0.  These price changes were disregarded because they do not represent a real price increase. Price changes with any of the values as "nan" were removed.
 * **Built_used_area.csv**: The entries with both built_area and used_area equal to "nan" were removed. For the ones in which only one of the values was "nan", this value was replaced to 0.
 After that, the entries with both built_area and used_area equal to 0 were removed. This file contained some duplicates, i.e. for some listing_ids, it had more than one entry. In such cases,    
 the duplicates were combined in a single listing_id and the built and used area values are replaced by the average of the values in the duplicates.

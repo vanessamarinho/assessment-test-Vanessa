@@ -9,6 +9,7 @@ Created on Wed Oct 11 15:18:00 2017
 from itertools import accumulate
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import pandas as pd
 from statsmodels.tsa.arima_model import ARIMA
 from pathlib import Path
@@ -88,6 +89,9 @@ for t in range(months_to_predict):
 	predicted = output[0]
 	predictions.append(predicted[0])
 	history.append(predicted)
+    
+if not os.path.exists("time_series_plots"):
+    os.makedirs("time_series_plots")
 
 plt.figure()
 predicted_series = pd.Series(predictions,index=[(pd.Period("09/2017")+i) for i in range(9)])
@@ -95,7 +99,7 @@ variation_series.plot(linestyle='--', marker='o')
 predicted_series.plot(linestyle='--', marker='o',color="red")
 plt.title("Monthly average variation of the price/sqm ")
 plt.ylabel("Average Variation")
-plt.savefig("time_series_variation_values.png")
+plt.savefig("time_series_plots/time_series_variation_values.png")
 
 #get the date of the first listing of each property
 first_prices = prices_sea_views_areas.groupby('listing_id')['change_date'].agg([min]).rename(columns={'min':'change_date'}).reset_index()
@@ -123,10 +127,9 @@ variation_series.plot(linestyle='--', marker='o')
 predicted_series.plot(linestyle='--', marker='o',color="red")
 plt.title("Monthly average price/sqm ")
 plt.ylabel("Average price/sqm")
-plt.savefig("time_series_values_monthly.png")
+plt.savefig("time_series_plots/time_series_values_monthly.png")
 
 #-----------------Question 3
-import os
 if not os.path.exists("outlier_properties"):
     os.makedirs("outlier_properties")
 #we do not remove unusual data here
