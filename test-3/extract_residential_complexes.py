@@ -12,6 +12,16 @@ import re
 import string
 import unicodedata
 
+#to clean repeated strings as "Golden Mile Marbela Golden Mile Marbela"
+#return only one "Golden Mile Marbela"
+def repeater(s):
+    s = s + " " #add space in the end some the repeated strings are symmetric
+    i = (s+s)[1:-1].find(s)
+    if i == -1:
+        return s[:-1]
+    else:
+        return s[:i]
+
 def pre_process_title(title):
     #convert accented characters to its unaccented version
     title = ''.join(c for c in unicodedata.normalize('NFD', title) if unicodedata.category(c) != 'Mn')
@@ -52,8 +62,7 @@ def classify_location_with_sentence_patterns(title):
         
     else:
         #words have to keep its capitalization for the pos_tag
-        #this tokenization that keeps the punctuation mark is needed
-        #to break the place.
+        #this tokenization that keeps the punctuation marks is needed to find the end of entities.
         chunked = pos_tag(word_tokenize(title))
         #now we dont neet capital letters
         chunked = [(element[0].lower(),element[1]) for element in chunked]
@@ -70,6 +79,7 @@ def classify_location_with_sentence_patterns(title):
                 if(len(location_parts)) > 0:
                     location = " ".join(location_parts)
                     break
+    location = repeater(location)
     if location not in ['marbella', 'puerto banus', 'golden mile', 'milla de oro', 'malaga']:
         return location
     else:
@@ -95,17 +105,6 @@ if __name__ == "__main__":
     data['automatic_category'] = data.apply(lambda row: classify_location_automatically(row, selected_locations),axis=1) 
     result = data['automatic_category'].groupby(data['automatic_category']).count()
     print(result.sort_values(ascending=False))
-    
-    
-    #improvements - some kind of external knowledge has to be used
-    #to identify for example that "rio verde", "rio verde alto" and "rio verde playa" are the same thing
-    
-    #TODO: FROM THE UNDEFINED, SEE HOW MANY ARE MARBELLA...
-    
-    
-    
-    
-    
     
     
     
