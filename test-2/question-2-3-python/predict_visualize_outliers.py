@@ -38,7 +38,7 @@ def get_final_values_after_month(month, data, previous_values):
 #------------------Read all data
 price_changes = pd.read_csv("Price_changes.csv", delimiter = ";")
 area = pd.read_csv("Built_used_area.csv", delimiter = ";")
-#check if the listings were categorized or not
+#check if the listings were classified or not
 details_with_categories = Path("Details_with_categories.csv")
 if details_with_categories.is_file() == False:
     classify_properties_sea_mountain.classify_all_properties()
@@ -64,16 +64,16 @@ prices_sea_views_areas['price_variation_per_square_meter'] = prices_sea_views_ar
 #Get plots of the dataframe
 #create_plots.plots(prices_sea_views_areas)
 
-#-----------------Removing outliers - 468 before removing outliers, 449 after
+#-----------------Removing outliers
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['new_price'] < 15000000) & (prices_sea_views_areas['old_price'] < 15000000) & (prices_sea_views_areas['used_area'] < 1250)  & (prices_sea_views_areas['built_area'] < 1250)]
 prices_sea_views_areas = prices_sea_views_areas[(prices_sea_views_areas['price_variation_per_square_meter'] > -5000) & (prices_sea_views_areas['price_variation_per_square_meter'] < 5000)]
 variation_per_sqm = prices_sea_views_areas.groupby('months_passed')['price_variation_per_square_meter'].agg([np.sum]).rename(columns={'sum':'monthly_variation_per_sqm'}) 
-#the variation has to be averaged over all listings, not the number of price_changes in that month
+#The variation of the price/sqm has to be averaged over all listings, not the number of price_changes in that month
 variation_per_sqm['monthly_variation_per_sqm'] = variation_per_sqm['monthly_variation_per_sqm']/len(prices_sea_views_areas['listing_id'].unique())
 
 #-----------------Predict
 #To predict prices in January, February, March, April and May 2018
-#we need to predict the variation for September to December first
+#we also need to predict the variation for September to December
 months_to_predict = 9
 months = [(pd.Period("09/2017")+i) for i in range(20)]
 variation_series = pd.Series(variation_per_sqm['monthly_variation_per_sqm'].tolist(),index=[(pd.Period("01/2016")+i) for i in range(20)])
@@ -99,15 +99,15 @@ plt.savefig("time_series_variation_values.png")
 
 #get the date of the first listing of each property
 first_prices = prices_sea_views_areas.groupby('listing_id')['change_date'].agg([min]).rename(columns={'min':'change_date'}).reset_index()
-#get the old_price of each property - considered to be the initial price
+#get the oldest old_price of each property - considered to be the initial price
 first_prices_area_info = pd.merge(prices_sea_views_areas, first_prices, on=['listing_id','change_date'])[['listing_id','built_area','used_area','old_price']] 
 first_prices_area_info["considered_area"] = first_prices_area_info[["used_area", "built_area"]].max(axis=1)
 first_prices_area_info['initial_price_per_sqm'] = first_prices_area_info['old_price']/first_prices_area_info['considered_area']
 initial_price_per_sqm = np.mean(first_prices_area_info['initial_price_per_sqm'])
 
-#Array in which the first element is the initial average price/sqm and the next are variations
+#list in which the first element is the initial average price/sqm and the next ones are variations
 initial_price_and_variations = [initial_price_per_sqm] + variation_per_sqm['monthly_variation_per_sqm'].tolist() + predictions
-#Accumulate to get the values of the price/sqm
+#Accumulate to get the values of the price/sqm in all months
 price_per_sqm_series = list(accumulate(initial_price_and_variations))
 
 #Calculate predicted values
@@ -126,16 +126,16 @@ plt.ylabel("Average price/sqm")
 plt.savefig("time_series_values_monthly.png")
 
 #-----------------Question 3
-print("-------------- Question3 --------------")
 import os
 if not os.path.exists("outlier_properties"):
     os.makedirs("outlier_properties")
-#we dont remove unusual data here
+#we do not remove unusual data here
 prices_sea_views_areas_question3 = pd.merge(area, prices_sea_views, on='listing_id') 
+#removing very expensive properties that make yaxis too large
 prices_sea_views_areas_question3 = prices_sea_views_areas_question3[(prices_sea_views_areas_question3['old_price'] < 30000000) & (prices_sea_views_areas_question3['new_price'] < 30000000)]
 prices_sea_views_areas_question3['months_passed'] = prices_sea_views_areas_question3['change_date'].apply(get_number_of_months)
+#get the oldest old_price of each property
 first_prices = prices_sea_views_areas_question3.groupby('listing_id')['change_date'].agg([min]).rename(columns={'min':'change_date'}).reset_index()
-#get the old_price of each property
 first_prices_area_info_question3 = pd.merge(prices_sea_views_areas_question3, first_prices, on=['listing_id','change_date'])[['listing_id','built_area','used_area','old_price']] 
 first_prices_area_info_question3["considered_area"] = first_prices_area_info_question3[["used_area", "built_area"]].max(axis=1)
     
@@ -145,7 +145,7 @@ updated_prices = first_prices_area_info_question3[['listing_id','old_price']]
 updated_prices.columns= [['listing_id','new_price']]
 colors = ["DarkGreen","DarkBlue"]
 
-#The undervalued values for all months (20 months) are presented inside the folder "outlier_properties"
+#The undervalued values for all months are presented inside the folder "outlier_properties"
 #To avoid warnings because this code plots many graphs, the loop below will just go
 #through the first 6 months, change it to range(1,21) to see the plots for all
 #for month in range(1,21):
@@ -154,10 +154,10 @@ for month in range(1,6):
     listings_price_per_sqm = updated_prices['new_price']/first_prices_area_info_question3['considered_area']
     monthly_avg_deviation = np.std(listings_price_per_sqm)
     plt.figure()
-    #to visualize all points, change the value of the two lines to be greater than 3,000 
+    #to visualize all points, change the value of the two following lines to be greater than 3,000 
     plt.xlim(0, 1400)
     x=np.arange(1400)
-    #plot average line
+    #plot average line and standard deviation
     plt.plot(x, price_per_sqm_series[month]*x, '--', color='k')
     plt.fill_between(x, x*(price_per_sqm_series[month]-1*monthly_avg_deviation), x*(price_per_sqm_series[month] +1*monthly_avg_deviation), color='lightgrey',alpha = 0.9)
     plt.ylabel("Price")

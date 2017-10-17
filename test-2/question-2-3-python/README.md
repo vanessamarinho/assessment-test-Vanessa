@@ -8,6 +8,7 @@ Questions 2 and 3 were solved together.
 * numpy (version 1.13.3)
 * pandas (version 0.20.1)
 * matplotlib (version 2.0.2)
+* NLTK (version 3.2.3)
 
 ### To run the code for questions 2 and 3 do:
 
@@ -53,7 +54,9 @@ One description from the *Undefined* class is presented below:
 Security system, Fireplace, Terrace, Guest apartment, Jacuzzi, Air conditioning, Swimming pool, Basement, Sauna,  Guest toilet, Garden, Built-in kitchen
 ```
 
-**NOTE:** The experiments in question 2 and 3 were then made for properties classified as *Sea Area* and *Both*
+A way to extend this approach could include the analysis of the semantic similarity among words, which can be obtained with wordnets or word embeddings.
+
+**NOTES:** The experiments in question 2 and 3 were then made for properties classified as *Sea Area* and *Both*.
 
 ## Rationale
 
@@ -106,7 +109,7 @@ One technique that can be used to predict time series values is called moving av
 
 ![Time series with the average variation prices/sqm](time_series_plots/time_series_variation_values.png?raw=true "Time series with the average variation prices/sqm")
 
-As I mentioned earlier, this obtained time series can be considered *stationary*, since the mean doesn't vary much over time. We see that the averages for the predicted points are positive, negative and then positive again. Now that we predicted the average variation prices/sqm, the actual average prices/sqm are given by applying the successive variations to the initial average price/sqm, which was considered as the average of the old prices of the properties in their first price change. The time series with the average prices/sqm is presented below.
+As I mentioned earlier, this obtained time series can be considered *stationary*, since the mean doesn't vary much over time. We see that the averages for the predicted points are positive, negative and then positive again. Now that we predicted the average variation prices/sqm, the actual average prices/sqm are given by applying the successive variations to the initial average price/sqm, which was considered as the average of the old prices of the properties in their first price change, i.e. the oldest old prices. The time series with the average prices/sqm is presented below.
 
 ![Time series with the average prices/sqm](time_series_plots/time_series_values_monthly.png?raw=true "Time series with the average prices/sqm")
 
@@ -114,11 +117,11 @@ There is a decreasing trend in this time series, in which the prices/sqm are usu
 
 | Month        | Price  |
 | ------------- |:-------------:| 
-| 2018-01      | 1724196 | 
-| 2018-02      | 1720897      | 
-| 2018-03      | 1721494      | 
-| 2018-04 | 1722132      |  
-| 2018-05 | 1722905      |
+| 2018-01      | 1,724,196 | 
+| 2018-02      | 1,720,897      | 
+| 2018-03      | 1,721,494      | 
+| 2018-04 | 1,722,132      |  
+| 2018-05 | 1,722,905      |
 
 ## Undervalued outliers - Question 3
 For this question, I included back those unusual points that were removed in Question 2, and I used the average prices/sqm calculated on Question 2 to determine undervalued properties. There were only a few properties with prices greater than 30M (listing_ids=290227, 281582 and 296543) that were removed because these points were making the y axis too large, and we are only interested in undervalued properties, not overvalued ones.
@@ -139,6 +142,6 @@ I looked at the data and I found out the outlier with area of 1,200. A few featu
 
 |listing_id | built_area | used_area | old_price | new_price | change_date | Details | Category|
 |-----------|:----------:|:---------:|:---------:|:---------:|:-----------:|:-------:|:---------------------------------:| 
-|296792	| 0.0	| 1200.0	| 2150000	| 3350000| 2016-05-25	| Mountain view,Sea View,Private... | Both|
+|296792	| 0.0	| 1200.0	| 2150000	| 3350000| 2016-05-25	| Mountain view, Sea View, Private... | Both|
 
 **NOTE**: To avoid warnings because this question plots many graphs, the code that creates the scatterplots just loops through the first 6 months, change it to range(1,21) to see the plots for all months. The plots are included in the folder "outlier_properties".

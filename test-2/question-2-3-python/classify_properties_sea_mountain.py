@@ -12,21 +12,8 @@ from nltk.tokenize import RegexpTokenizer
 
 categories = ["Mountain Area", "Sea Area"]
 number_of_categories = len(categories)
-#attempt to classify each listing between the classes
-#I got some frequent words that could be found in each category
-#GET THE FREQUENCY OF THE WORDS
+#Frequent words that could be found in each category
 seeds_per_category = [["mountain","mountains","country"],["sea","ocean","beach","beaches","lake","lakes","bay"]]
-#Simple approach that worked fine for this example
-#classified as distant supervision approach -
-#classify data according to some rules
-#another way was to increment it and use techniques to find
-#semantic similarity among words - such as wordnet or wordembeddings
-
-#remove punctuation marks, replace / by space
-#if it has 0 from one set and some from the other
-#classify as the other
-#if it doesnt look for similar words -- I didnt add all the words because that 
-#wouldnt generalize, may not capture all properties
 
 def classify_one_property(text):
     tokenizer = RegexpTokenizer(r'\w+')
@@ -36,7 +23,7 @@ def classify_one_property(text):
     for category,seeds in zip(categories,seeds_per_category):
         for word in seeds:
             occurrences_per_category[category] += occurrences[word]
-    #Classify
+    #Classify according to the occurrence of seed words
     if(occurrences_per_category["Mountain Area"] > 0 and occurrences_per_category["Sea Area"] == 0):
         return "Mountain Area"
     elif(occurrences_per_category["Mountain Area"] == 0 and occurrences_per_category["Sea Area"] > 0):
@@ -49,7 +36,6 @@ def classify_one_property(text):
 def classify_all_properties():
     data = pd.read_csv("Details.csv",delimiter=";")
     
-    #apply function to all fields
     data['Category'] = data['Details'].apply(classify_one_property)
     data.to_csv("Details_with_categories.csv",sep=";",index = False)
     result = data['Category'].reset_index()
