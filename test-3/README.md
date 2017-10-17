@@ -14,16 +14,16 @@ Some descriptions of the properties are in English and Spanish. Therefore, *my f
 
 My *second attempt* was to use named entity recognition (NER) systems in the English texts. The goal of these systems is to identify named entities, which are words that name people, organizations and location. However, these systems are case sensitive. In most of them, when a noun is found with capital letters, it's likely that this word will be classified as a Proper Noun, and would be classified as a named entity. Because of that, some words from the descriptions such as *Sale*, *Middle*, *Apartment* were classified as proper nouns. Lower-casing all words wouldn't help finding proper nouns (and therefore the named entities that represent the residential complexes) because all nouns and proper nouns would be mostly classified as nouns, which is mainly what a POS tagger does. Because of these reasons I did not use NER systems, only a POS tagger that I'll explain later. 
 
-In order to split the sentences between the two languages, I then hardcoded a few common words found in the Spanish listings, such as *en*, *venta*, *dormitorio*, and *apartamento*. Descriptions with at least one of those Spanish words would be treated as Spanish texts, otherwise the texts are considered as English.
+In order to split the sentences between the two languages, I then hard coded a few common words found in the Spanish listings, such as *en*, *venta*, *dormitorio*, and *apartamento*. Descriptions with at least one of those Spanish words would be treated as Spanish texts, otherwise the texts are considered as English.
 
 1. The approach to extract candidates for residential complexes from the **Spanish texts** was: 
 
-* I hardcoded two regular expressions to extract the possible residential complexes. 
+* I hard coded two regular expressions to extract the possible residential complexes. 
 ** The first one looks for words found right after the expression **en venta en**. 
 *** If this expression is found, all following words until a punctuation mark are extracted as a candidate for a residential complexes. 
 *** If this longer expression is not found, I then looked for sequence of words found right after the word **en** (which is a Spanish proposition used for location).
 
-2. The approach to extract candidates for residential complexes from the **English texts** was not hardcoded, instead it used a POS tagger. A part-of-speech (POS) tagger is a tool that tags words with their POS. The tags returned by the tagger follow this tagset convention, https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html.
+2. The approach to extract candidates for residential complexes from the **English texts** was not hard coded, instead it used a POS tagger. A part-of-speech (POS) tagger is a tool that tags words with their POS. The tags returned by the tagger follow this tagset convention, https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html.
 
 * The text is tagged and we look at all occurrences of the preposition IN. 
 ** If the proposition IN is followed by a word or a sequence of words tagged as Nouns (NN), Proper Nouns (NNP), and foreign words (FW), these following words are extracted. It's important to mention that this sequence is extracted until we find a word or character (such as punctuation marks) tagged with different POS tags.
