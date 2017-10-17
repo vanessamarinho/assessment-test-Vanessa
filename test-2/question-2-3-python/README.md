@@ -121,11 +121,11 @@ From this last graph, we can see that the predicted values fit fairly well the o
 | 2018-05 | 1722905      |
 
 ## Undervalued outliers - Question 3
-For this question, I included back those unusual points that were removed in Question 2, and I used the average prices/sqm found on Question 2 to determine undervalued properties. There were only a few properties with prices greater than 30M (listing_ids=290227, 281582 and 296543) that were removed because they were making the y axis too large, and we are only interested in undervalued properties, not overvalued ones.
+For this question, I included back those unusual points that were removed in Question 2, and I used the average prices/sqm calculated on Question 2 to determine undervalued properties. There were only a few properties with prices greater than 30M (listing_ids=290227, 281582 and 296543) that were removed because they were making the y axis too large, and we are only interested in undervalued properties, not overvalued ones.
 
-A simple method that can be used to detect outliers is to find the points which are distant from the average by values greater than the standard deviation. This is based on the fact that in a normal distribution, almost 70% of values are within 1 standard deviation of the mean. In order to identify those points, a scatterplot for each month was created. In each graph, all properties were plotted. I also plotted the average line and the standard deviation around the average. Listings with an average price/sqm greater than the average are plotted as green points. On the other hand, listings with an average price/sqm lower than the average are plotted in gray. Gray points outside the shaded area can be considered outliers, since they are far from the average line by more than one standard deviation.
+A simple method that can be used to detect outliers is to find the points which are distant from the average by values greater than the standard deviation (i.e. values outside of the range [mean - std, mean + std]). This is based on the fact that in a normal distribution, almost 70% of values are within 1 standard deviation of the mean. In order to identify those points, a scatterplot for each month was created. In each scatterplot, all properties, the average value and the standard deviation around the average are included. Listings with an average price/sqm greater than the average are plotted as green points. On the other hand, listings with an average price/sqm lower than the average are plotted in gray. Points outside the shaded area can be considered outliers (green points are overvalued and grey points are undervalued), since they are far from the average line by more than one standard deviation.
 
-The scatterplots for Months 1 and 5 (January 2016 and May 2016) are presented below:
+The scatterplots obtained for Months 1 and 5 (January 2016 and May 2016) are presented below:
 
 ![Price x Area in 2016/01"](outlier_properties_all_points/undervalues_2016-01.png?raw=true "Price x Area in 2016/01") ![Price x Area in 2016/05](outlier_properties_all_points/undervalues_2016-05.png?raw=true "Price x Area in 2016/05")
 
@@ -135,10 +135,9 @@ The graphs for the other months (which are very similar) are included in the fol
 
 A few undervalued outliers are easily spotted. The main one is a property with area of 1,200 and price at around 2,1M (not much greater than the predicted prices for the properties with sizes 200 - 300 in Question 2). A few months later, the price of this property was increased a bit, to around 3,2M. Other undervalued outliers have areas between 400 and 800 square meters and price values lower than 2,5M. The scatterplots from the other months do not change much from these two.
 
-I looked at the data and found that outlier with area of 1,200. A few features of this property is presented below.
+I looked at the data and I found out the outlier with area of 1,200. A few features of this property are presented below.
 
 | listing_id | built_area | used_area | old_price | new_price | change_date | Details | Category |
-| ------------- |:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|:-------------:| 
-| 296792	| 0.0	| 1200.0	| 2150000	| 3350000	| 2016-05-25	| Mountain view, Sea View, Private pool, Wellness, Bodega, Fireplace, ... | Both
+| 296792	| 0.0	| 1200.0	| 2150000	| 3350000	| 2016-05-25	| Mountain view, Sea View, Private pool, Wellness, Bodega, Fireplace, ... | Both |
 
 **NOTE**: To avoid warnings because this question plots many graphs, the code that creates the scatterplots just loops through the first 6 months, change it to range(1,21) to see the plots for all months. The plots are included in the folder "outlier_properties".
