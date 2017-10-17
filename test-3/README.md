@@ -18,15 +18,11 @@ In order to split the sentences between the two languages, I then hard coded a f
 
 1. The approach to extract candidates for residential complexes from the **Spanish texts** was: 
 
-* I hard coded two regular expressions to extract the possible residential complexes. 
-** The first one looks for words found right after the expression **en venta en**. 
-*** If this expression is found, all following words until a punctuation mark are extracted as a candidate for a residential complexes. 
-*** If this longer expression is not found, I then looked for sequence of words found right after the word **en** (which is a Spanish proposition used for location).
+* I hard coded two regular expressions to extract the possible residential complexes. The first one looks for words found right after the expression **en venta en**. If this expression is found, all following words until a punctuation mark are extracted as a candidate for a residential complex. If this longer expression is not found, I then looked for sequence of words found right after the word **en** (which is a Spanish preposition used for location).
 
 2. The approach to extract candidates for residential complexes from the **English texts** was not hard coded, instead it used a POS tagger. A part-of-speech (POS) tagger is a tool that tags words with their POS. The tags returned by the tagger follow this tagset convention, https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html.
 
-* The text is tagged and we look at all occurrences of the preposition IN. 
-** If the proposition IN is followed by a word or a sequence of words tagged as Nouns (NN), Proper Nouns (NNP), and foreign words (FW), these following words are extracted. It's important to mention that this sequence is extracted until we find a word or character (such as punctuation marks) tagged with different POS tags.
+* The text is tagged and we look at all occurrences of the preposition IN. If the preposition IN is followed by a word or a sequence of words tagged as Nouns (NN), Proper Nouns (NNP), and foreign words (FW), these following words are extracted. It's important to mention that this sequence is extracted until we find a word or character (such as punctuation marks) tagged with different POS tags.
 
 After extracting the candidates according to one of the previous presented approaches, I verify if this candidate is not in the list of geographical names [*Marbella*, *Puerto Banus*, *Golden Mile*, *Milla de Oro*, *Malaga*]. If the candidate is not in the list, that description is initially tagged with that residential complex and this candidate is part of the list of possible candidates. Before verifying if the candidate word is in the list of geographical names, a pre-processing code is executed in order to eliminate repeated locations, such as "marbella golden mile marbella golden mile" or "malaga malaga".
 
@@ -36,11 +32,11 @@ From the list of possible candidates obtained in the previous step, the ones wit
 
 In this second look at the dataset, the descriptions classified with residential locations in the *selected_locations* were kept as they are. The text of the descriptions not classified yet or with classifications not on the list (i.e. the ones with frequency less than one) is searched in order to find at least one residential complex from the list *selected_locations*. If one match is found, this description is classified with that residential complex. If no match is found, this text is classified as "UNDEFINED".
 
-This reclassification step is performed in order to generalize the rules to more data, because some description to not include the residential complex after textual indicators such as "en" or "in". Some could simply do "property for sale, reserva de marbella"
+This reclassification step is performed in order to generalize the rules to more data, because some descriptions do not include the residential complex after textual indicators such as "en" or "in". Some could simply do "property for sale, reserva de marbella".
 
 ## Results
 
-The frequency of some extracted residential complexes are presented below.
+The frequencies of some extracted residential complexes are presented below.
 
 | automatic_category           | Counts |
 | -------------------------- |:----------:| 
@@ -73,6 +69,6 @@ The frequency of some extracted residential complexes are presented below.
 
 ## Notes
 
-There were a few things that I wanted to try in this test but I didn't have time. One of them was to use a Spanish part-of-speech tagger instead of the hard coded rules. So that the Spanish approach would be similar to the English one, in which Nouns (NN), Proper Nouns (NNP), and foreign words (FW) after the preposition "in" are likely to be locations. As far as I'm aware, NLTK does not provide a Spanish POS tagger but it does provide some Spanish tagged text in which a unigram and bigram tagger can be trained. The other thing would be to include the few filled Meta location values in the analysis.
+There were a few things that I wanted to try in this test but I didn't have time. One of them was to use a Spanish part-of-speech tagger instead of the hard coded rules. So that the Spanish approach would be similar to the English one, in which Nouns (NN), Proper Nouns (NNP), and foreign words (FW) after a preposition are likely to be residential complexes. As far as I'm aware, NLTK does not provide a Spanish POS tagger but it does provide some Spanish tagged text in which a unigram and bigram tagger can be trained. The other thing would be to include the few filled Meta location values in the analysis.
 
 For this task, some kind of external knowledge could be used in order to achieve better results. For example, extra information would be needed to differentiate "rio verde", "rio verde alto" and "rio verde playa" or group them as the same residential complex.
