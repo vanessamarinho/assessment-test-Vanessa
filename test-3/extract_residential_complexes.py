@@ -12,10 +12,10 @@ import re
 import string
 import unicodedata
 
-#to clean repeated strings as "Golden Mile Marbela Golden Mile Marbela"
-#return only one "Golden Mile Marbela"
+#to clean repeated strings as "Marbela Golden Mile Marbela Golden Mile"
+#return only one "Marbela Golden Mile"
 def repeater(s):
-    s = s + " " #add space in the end some the repeated strings are symmetric
+    s = s + " " #add space in the end so the repeated strings are symmetric
     i = (s+s)[1:-1].find(s)
     if i == -1:
         return s[:-1]
@@ -97,7 +97,6 @@ if __name__ == "__main__":
     result.columns = ["occurrences"]
     #remove least frequent entities found - avoid overfitting
     result = result[result['occurrences'] >= 2]
-    #get the longest strings first to try to match them
     selected_locations = result.index.values.tolist()
     selected_locations.sort(key=len, reverse = True)
     
