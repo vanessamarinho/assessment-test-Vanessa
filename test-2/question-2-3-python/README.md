@@ -12,7 +12,7 @@ Questions 2 and 3 were solved together.
 
 ### To run the code for questions 2 and 3 do:
 
-```
+```python
 python predict_visualize_outliers.py
 ```
 
